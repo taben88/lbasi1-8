@@ -43,9 +43,9 @@ class InterpreterTests(unittest.TestCase):
             Token(TokenTypes.OP, "+"),
             Token(TokenTypes.INT, 5),
             ]
-        output: int = Interpreter.interpret(tokens)
-        excepted: int = 8
-        self.assertEqual(first=output, second=excepted)
+        output: int|float = Interpreter.interpret(tokens)
+        expected: int = 8
+        self.assertEqual(first=output, second=expected)
     
     def testSub(self) -> None:
         tokens: list[Token] = [
@@ -53,9 +53,23 @@ class InterpreterTests(unittest.TestCase):
             Token(TokenTypes.OP, "-"),
             Token(TokenTypes.INT, 5),
             ]
-        output: int = Interpreter.interpret(tokens)
-        excepted: int = -2
-        self.assertEqual(first=output, second=excepted)
+        output: int|float = Interpreter.interpret(tokens)
+        expected: int = -2
+        self.assertEqual(first=output, second=expected)
 
+    def testMulti(self) -> None:
+        tokens: list[Token] = [
+            Token(TokenTypes.INT, 9), 
+            Token(TokenTypes.OP, "-"),
+            Token(TokenTypes.INT, 5),
+            Token(TokenTypes.OP, "+"),
+            Token(TokenTypes.INT, 3),
+            Token(TokenTypes.OP, "+"),
+            Token(TokenTypes.INT, 11),
+            ]
+        output: int|float = Interpreter.interpret(tokens)
+        expected: int = 9 - 5 + 3 + 11
+        self.assertEqual(first=output, second=expected)
+        
 if __name__ == "__main__":
     unittest.main()
