@@ -3,44 +3,47 @@ import io
 from common import Token, TokenTypes
 
 class Modes(Enum):
-    INIT = auto()
-    SPACE = auto()
     SINGLE = auto()
     MULTI = auto()
 
-OPERATORS: str = "+-"
+OPERATORS: str = "+-*/"
 
-def lex(src: io.TextIOBase) -> list[Token]:
-    buffer: io.StringIO = io.StringIO()
-    multi_token_type = TokenTypes.NONE
-    tokens: list[Token] = []
-    c: str | None = None
-    while c := src.read(1):
-        match c:
-            case c if c.isspace():
-                if multi_token_type:
-                    tokens.append(Token(multi_token_type, int(buffer.getvalue())))
-                    buffer.close()
-                    buffer = io.StringIO()
-                    multi_token_type = TokenTypes.NONE
-                pass
-            case c if c.isdigit():
-                if not multi_token_type:
-                    multi_token_type = TokenTypes.INT
-                buffer.write(c)
-            case c if c in OPERATORS:
-                if multi_token_type:
-                    tokens.append(Token(multi_token_type, int(buffer.getvalue())))
-                    buffer.close()
-                    buffer = io.StringIO()
-                    multi_token_type = TokenTypes.NONE
-                tokens.append(Token(TokenTypes.OP, c))
-            case _:
-                raise AssertionError("Unexpected character encountered!")
-    if multi_token_type:
-        tokens.append(Token(multi_token_type, int(buffer.getvalue())))
-        buffer.close()
-    return tokens
+class Lexer:
+    def __init__(self, src: io.TextIOBase) -> None:
+        self.src = src
+        self.buffer: io.StringIO = io.StringIO()
+        self.multi_token_type = TokenTypes.NONE
+        self.tokens: list[Token] = []
+    
+    def lex(self) -> list[Token]:
+        while c := self.src.read(1):
+            match c:
+                case c if c.isspace():
+                    if self.multi_token_type:
+                        self.emit_multi()
+                    pass
+                case c if c.isdigit():
+                    if not self.multi_token_type:
+                        self.multi_token_type = TokenTypes.INT
+                    self.buffer.write(c)
+                case c if c in OPERATORS:
+                    if self.multi_token_type:
+                        self.emit_multi()
+                    self.tokens.append(Token(TokenTypes.OP, c))
+                case _:
+                    raise AssertionError("Unexpected character encountered!")
+        if self.multi_token_type:
+            self.emit_multi()
+        return self.tokens
+                
+    def emit_multi(self) -> None:
+        match self.multi_token_type:
+            case TokenTypes.INT:
+                value = int(self.buffer.getvalue())
+        self.tokens.append(Token(self.multi_token_type, value))
+        self.buffer.close()
+        self.buffer = io.StringIO()
+        self.multi_token_type = TokenTypes.NONE
 
 if __name__ == "__main__":
-    print(lex(io.StringIO("12")))
+    ...

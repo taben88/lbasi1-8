@@ -1,28 +1,29 @@
 import unittest
 import io
 from common import Token, TokenTypes
-import Lexer
+from Lexer import Lexer
 import Interpreter
 
 class LexerTests(unittest.TestCase):
     def testEmpty(self) -> None:
-        output: list[Token] = Lexer.lex(io.StringIO(" \t\n"))
+        output: list[Token] = Lexer(io.StringIO(" \t\n")).lex()
         self.assertEqual(first=output, second=[])
 
     def testSingleDigit(self) -> None:
-        output: list[Token] = Lexer.lex(io.StringIO("3"))
-        self.assertEqual(first=output, second=[Token(Lexer.TokenTypes.INT, 3)])
+        output: list[Token] = Lexer(io.StringIO("3")).lex()
+        self.assertEqual(first=output, second=[Token(TokenTypes.INT, 3)])
 
     def testMultiDigit(self) -> None:
-        output: list[Token] = Lexer.lex(io.StringIO("12"))
-        self.assertEqual(first=output, second=[Token(Lexer.TokenTypes.INT, 12)])
+        output: list[Token] = Lexer(io.StringIO("12")).lex()
+        self.assertEqual(first=output, second=[Token(TokenTypes.INT, 12)])
     
-    def testOp(self) -> None:
-        output: list[Token] = Lexer.lex(io.StringIO("+"))
-        self.assertEqual(first=output, second=[Token(Lexer.TokenTypes.OP, "+")])
+    def testOps(self) -> None:
+        operators: str = "+-*/"
+        output: list[Token] = Lexer(io.StringIO(operators)).lex()
+        self.assertEqual(first=output, second=[Token(TokenTypes.OP, c) for c in operators])
 
     def testMixed(self) -> None:
-        output: list[Token] = Lexer.lex(io.StringIO("3 +5"))
+        output: list[Token] = Lexer(io.StringIO("3 +5")).lex()
         
         expected: list[Token] = [
             Token(TokenTypes.INT, 3), 
@@ -33,7 +34,7 @@ class LexerTests(unittest.TestCase):
 
     def testUnknown(self) -> None:
         with self.assertRaises(AssertionError):
-            Lexer.lex(io.StringIO("."))
+            Lexer(io.StringIO(".")).lex()
 
 class InterpreterTests(unittest.TestCase):
     def testAdd(self) -> None:
