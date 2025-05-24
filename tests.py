@@ -56,8 +56,28 @@ class InterpreterTests(unittest.TestCase):
         output: int|float = Interpreter.interpret(tokens)
         expected: int = -2
         self.assertEqual(first=output, second=expected)
-
+    
     def testMulti(self) -> None:
+        tokens: list[Token] = [
+            Token(TokenTypes.INT, 3), 
+            Token(TokenTypes.OP, "*"),
+            Token(TokenTypes.INT, 5),
+            ]
+        output: int|float = Interpreter.interpret(tokens)
+        expected: int = 15
+        self.assertEqual(first=output, second=expected)
+
+    def testDiv(self) -> None:
+        tokens: list[Token] = [
+            Token(TokenTypes.INT, 6), 
+            Token(TokenTypes.OP, "/"),
+            Token(TokenTypes.INT, 2),
+            ]
+        output: int|float = Interpreter.interpret(tokens)
+        expected: float = 3.0
+        self.assertEqual(first=output, second=expected)
+
+    def testAssoc(self) -> None:
         tokens: list[Token] = [
             Token(TokenTypes.INT, 9), 
             Token(TokenTypes.OP, "-"),
@@ -70,6 +90,18 @@ class InterpreterTests(unittest.TestCase):
         output: int|float = Interpreter.interpret(tokens)
         expected: int = 9 - 5 + 3 + 11
         self.assertEqual(first=output, second=expected)
-        
+    
+    def testPrecedence(self) -> None:
+        tokens: list[Token] = [
+            Token(TokenTypes.INT, 7), 
+            Token(TokenTypes.OP, "+"),
+            Token(TokenTypes.INT, 5),
+            Token(TokenTypes.OP, "*"),
+            Token(TokenTypes.INT, 2)
+            ]
+        output: int|float = Interpreter.interpret(tokens)
+        expected: int = 7 + 5 * 2
+        self.assertEqual(first=output, second=expected)
+
 if __name__ == "__main__":
     unittest.main()
