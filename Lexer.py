@@ -1,21 +1,21 @@
-from enum import Enum, auto
 import io
 from common import Token, TokenTypes
-
-class Modes(Enum):
-    SINGLE = auto()
-    MULTI = auto()
 
 OPERATORS: str = "+-*/"
 
 class Lexer:
     def __init__(self, src: io.TextIOBase) -> None:
-        self.src = src
-        self.buffer: io.StringIO = io.StringIO()
-        self.multi_token_type = TokenTypes.NONE
-        self.tokens: list[Token] = []
+        self.src = src # The source code to be lexed
+        self.buffer: io.StringIO = io.StringIO() # Buffer to handle items spanning multiple chars
+        self.multi_token_type: TokenTypes = TokenTypes.NONE # The type of the multichar token being lexed
+        self.tokens: list[Token] = [] # Tokens lexed from source code
     
     def lex(self) -> list[Token]:
+
+        """
+        
+        """
+
         while c := self.src.read(1):
             match c:
                 case c if c.isspace():
@@ -37,6 +37,11 @@ class Lexer:
         return self.tokens
                 
     def emit_multi(self) -> None:
+
+        """
+        
+        """
+
         match self.multi_token_type:
             case TokenTypes.INT:
                 value = int(self.buffer.getvalue())
