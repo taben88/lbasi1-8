@@ -22,13 +22,20 @@ class LexerTests(unittest.TestCase):
         output: list[Token] = Lexer(io.StringIO(operators)).lex()
         self.assertEqual(first=output, second=[Token(TokenTypes.OP, c) for c in operators])
 
+    def testParen(self) -> None:
+        parens: str = "()"
+        output: list[Token] = Lexer(io.StringIO(parens)).lex()
+        self.assertEqual(first=output, second=[Token(TokenTypes.PAREN, c) for c in parens])
+
     def testMixed(self) -> None:
-        output: list[Token] = Lexer(io.StringIO("3 +5")).lex()
+        output: list[Token] = Lexer(io.StringIO("(3 +55)")).lex()
         
         expected: list[Token] = [
+            Token(TokenTypes.PAREN, "("),
             Token(TokenTypes.INT, 3), 
             Token(TokenTypes.OP, "+"),
-            Token(TokenTypes.INT, 5),
+            Token(TokenTypes.INT, 55),
+            Token(TokenTypes.PAREN, ")"),
             ]
         self.assertEqual(first=output, second=expected)
 
