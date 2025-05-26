@@ -1,8 +1,6 @@
 import io
-from common import Token, TokenTypes
+from common import Token, TokenTypes, OPERATORS, PARENS
 
-OPERATORS: str = "+-*/"
-PARENS: str = "()"
 
 class Lexer:
     def __init__(self, src: io.TextIOBase) -> None:
@@ -30,11 +28,11 @@ class Lexer:
                 case c if c in OPERATORS:
                     if self.multi_token_type:
                         self.emit_multi()
-                    self.tokens.append(Token(TokenTypes.OP, c))
+                    self.tokens.append(OPERATORS[c])
                 case c if c in PARENS:
                     if self.multi_token_type:
                         self.emit_multi()
-                    self.tokens.append(Token(TokenTypes.PAREN, c))
+                    self.tokens.append(PARENS[c])
                 case _:
                     raise AssertionError("Unexpected character encountered!")
         if self.multi_token_type:
