@@ -139,6 +139,48 @@ class ParserTests(unittest.TestCase):
     def setUp(self) -> None:
         self.visitor: Visitor = Visitor()
 
+    def testMalformedOpStart(self) -> None:
+        tokens: list[Token] = [
+            OPERATORS["*"], 
+            Token(TokenTypes.INT, 3)
+            ]
+        with self.assertRaises(expected_exception=AssertionError):
+            Parser(tokens).parse()
+
+    def testMalformedOpMid(self) -> None:
+        tokens: list[Token] = [
+            Token(TokenTypes.INT, 3),
+            OPERATORS["*"],
+            OPERATORS["/"],
+            Token(TokenTypes.INT, 3)
+            ]
+        with self.assertRaises(expected_exception=AssertionError):
+            Parser(tokens).parse()
+
+    def testMalformedOpEnd(self) -> None:
+        tokens: list[Token] = [
+            Token(TokenTypes.INT, 3),
+            OPERATORS["*"]
+            ]
+        with self.assertRaises(expected_exception=AssertionError):
+            Parser(tokens).parse()
+
+    def testMalformedNum(self) -> None:
+        tokens: list[Token] = [
+            Token(TokenTypes.INT, 3), 
+            Token(TokenTypes.INT, 3)
+            ]
+        with self.assertRaises(expected_exception=AssertionError):
+            Parser(tokens).parse()
+
+    def testNum(self) -> None:
+        tokens: list[Token] = [
+            Token(TokenTypes.INT, 3), 
+            ]
+        expected: int = 3
+        root: AST = Parser(tokens).parse()
+        self.assertEqual(first=self.visitor.visit(root), second=expected)
+
     def testAdd(self) -> None:
         tokens: list[Token] = [
             Token(TokenTypes.INT, 3), 

@@ -1,4 +1,5 @@
-from common import AST, Num, BinOp, Token, TokenTypes, OPERATORS, PARENS
+from common import AST, Num, BinOp, Token, TokenTypes
+from typing import Callable
 
 class Parser:
     def __init__(self, tokens: list[Token]) -> None:
@@ -33,24 +34,29 @@ class Parser:
             case TokenTypes.LPAREN:
                 out = self.paren()
             case _:
-                raise AssertionError
+                raise AssertionError("Unexpected token encountered!")
         return out
-    
+
+    def operation(self, op_type: set[TokenTypes], op_start: Callable[[], AST]) -> AST:
+        out: AST = op_start()
+        while self.tokens and self.head.type in op_type:
+            op_token: Token = self.expect(self.head.type)
+            try:
+                right=op_start()
+            except IndexError:
+                raise AssertionError("No more tokens left!")
+            else:
+                out = BinOp(token=op_token, left=out, right=right)
+        return out
+
     def product(self) -> AST:
-        left: AST = self.operand()
-        while self.tokens and self.head.type in {TokenTypes.DIV, TokenTypes.MUL}:
-            ttype: TokenTypes = self.head.type
-            op: AST = BinOp(token=self.expect(ttype), left=left, right=self.operand())
-            left = op
-        return left
+        return self.operation({TokenTypes.DIV, TokenTypes.MUL}, self.operand)
 
     def sum_(self) -> AST:
-        left: AST = self.product()
-        while self.tokens and self.head.type in {TokenTypes.PLUS, TokenTypes.MINUS}:
-            ttype: TokenTypes = self.head.type
-            op: AST = BinOp(token=self.expect(ttype), left=left, right=self.product())
-            left = op
-        return left
+        return self.operation({TokenTypes.PLUS, TokenTypes.MINUS}, self.product)
 
     def parse(self) -> AST:
-        return self.sum_()
+        out: AST = self.sum_()
+        if self.tokens:
+            raise AssertionError("Unexpected token encountered!")
+        return out
