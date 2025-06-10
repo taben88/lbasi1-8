@@ -60,12 +60,6 @@ class Visitor:
         return result
     
 class Printer:
-    def polish(self, root: AST) -> str:
-
-        """Return str with RPN representation of mathematical expression."""
-
-        return root._polish(self)
-
     def _print_num(self, num: Num) -> str:
         return str(num)
 

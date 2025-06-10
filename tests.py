@@ -30,7 +30,7 @@ class LexerTests(unittest.TestCase):
         output: list[Token] = Lexer(io.StringIO("(3 +55)")).lex()
         
         expected: list[Token] = [
-            PARENS["()"],
+            PARENS["("],
             Token(TokenTypes.INT, 3), 
             OPERATORS["+"],
             Token(TokenTypes.INT, 55),
@@ -273,8 +273,8 @@ class ParserTests(unittest.TestCase):
         root: AST = Parser(tokens).parse()
         self.assertEqual(first=self.visitor.visit(root), second=expected)
 
-class PrinterTests(unittest.TestCase):
-    def testPolishNum(self) -> None:
+class PolishPrinterTests(unittest.TestCase):
+    def testNum(self) -> None:
         tokens: list[Token] = [
             Token(TokenTypes.INT, 3),
             ]
@@ -282,7 +282,7 @@ class PrinterTests(unittest.TestCase):
         root: AST = Parser(tokens).parse()
         self.assertEqual(first=Printer().polish(root), second=expected)
 
-    def testPolishSimplex(self) -> None:
+    def testSimplex(self) -> None:
         tokens: list[Token] = [
             Token(TokenTypes.INT, 3), 
             OPERATORS["*"],
@@ -292,7 +292,7 @@ class PrinterTests(unittest.TestCase):
         root: AST = Parser(tokens).parse()
         self.assertEqual(first=Printer().polish(root), second=expected)
     
-    def testPolishComplex(self) -> None:
+    def testComplex(self) -> None:
         tokens: list[Token] = [
             PARENS["("],
             Token(TokenTypes.INT, 3), 
