@@ -12,14 +12,14 @@ class Lexer:
     def lex(self) -> list[Token]:
 
         """
-        
+            Lex the the content of source, return list of tokens lexed.
         """
 
         while c := self.src.read(1):
             match c:
                 case c if c.isspace():
                     if self.multi_token_type:
-                        self.emit_multi()
+                        self._emit_multi()
                     pass
                 case c if c.isdigit():
                     if not self.multi_token_type:
@@ -27,22 +27,22 @@ class Lexer:
                     self.buffer.write(c)
                 case c if c in OPERATORS:
                     if self.multi_token_type:
-                        self.emit_multi()
+                        self._emit_multi()
                     self.tokens.append(OPERATORS[c])
                 case c if c in PARENS:
                     if self.multi_token_type:
-                        self.emit_multi()
+                        self._emit_multi()
                     self.tokens.append(PARENS[c])
                 case _:
                     raise AssertionError("Unexpected character encountered!")
         if self.multi_token_type:
-            self.emit_multi()
+            self._emit_multi()
         return self.tokens
                 
-    def emit_multi(self) -> None:
+    def _emit_multi(self) -> None:
 
         """
-        
+            Helper function to handle tokens made up of more than one characters.
         """
 
         match self.multi_token_type:

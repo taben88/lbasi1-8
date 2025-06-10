@@ -3,7 +3,7 @@ import io
 from common import Token, TokenTypes, OPERATORS, PARENS, AST, Visitor
 from Lexer import Lexer
 from Parser import Parser
-import Interpreter
+# import Interpreter
 
 class LexerTests(unittest.TestCase):
     def testEmpty(self) -> None:
@@ -30,11 +30,11 @@ class LexerTests(unittest.TestCase):
         output: list[Token] = Lexer(io.StringIO("(3 +55)")).lex()
         
         expected: list[Token] = [
-            Token(TokenTypes.LPAREN, "("),
+            PARENS["()"],
             Token(TokenTypes.INT, 3), 
-            Token(TokenTypes.PLUS, "+"),
+            OPERATORS["+"],
             Token(TokenTypes.INT, 55),
-            Token(TokenTypes.RPAREN, ")"),
+            PARENS[")"],
             ]
         self.assertEqual(first=output, second=expected)
 
@@ -42,98 +42,98 @@ class LexerTests(unittest.TestCase):
         with self.assertRaises(AssertionError):
             Lexer(io.StringIO(".")).lex()
 
-class InterpreterTests(unittest.TestCase):
-    def testAdd(self) -> None:
-        tokens: list[Token] = [
-            Token(TokenTypes.INT, 3), 
-            Token(TokenTypes.PLUS, "+"),
-            Token(TokenTypes.INT, 5),
-            ]
-        output: int|float = Interpreter.interpret(tokens)
-        expected: int = 8
-        self.assertEqual(first=output, second=expected)
+# class InterpreterTests(unittest.TestCase):
+#     def testAdd(self) -> None:
+#         tokens: list[Token] = [
+#             Token(TokenTypes.INT, 3), 
+#             Token(TokenTypes.PLUS, "+"),
+#             Token(TokenTypes.INT, 5),
+#             ]
+#         output: int|float = Interpreter.interpret(tokens)
+#         expected: int = 8
+#         self.assertEqual(first=output, second=expected)
     
-    def testSub(self) -> None:
-        tokens: list[Token] = [
-            Token(TokenTypes.INT, 3), 
-            Token(TokenTypes.MINUS, "-"),
-            Token(TokenTypes.INT, 5),
-            ]
-        output: int|float = Interpreter.interpret(tokens)
-        expected: int = -2
-        self.assertEqual(first=output, second=expected)
+#     def testSub(self) -> None:
+#         tokens: list[Token] = [
+#             Token(TokenTypes.INT, 3), 
+#             Token(TokenTypes.MINUS, "-"),
+#             Token(TokenTypes.INT, 5),
+#             ]
+#         output: int|float = Interpreter.interpret(tokens)
+#         expected: int = -2
+#         self.assertEqual(first=output, second=expected)
     
-    def testMulti(self) -> None:
-        tokens: list[Token] = [
-            Token(TokenTypes.INT, 3), 
-            Token(TokenTypes.MUL, "*"),
-            Token(TokenTypes.INT, 5),
-            ]
-        output: int|float = Interpreter.interpret(tokens)
-        expected: int = 15
-        self.assertEqual(first=output, second=expected)
+#     def testMulti(self) -> None:
+#         tokens: list[Token] = [
+#             Token(TokenTypes.INT, 3), 
+#             Token(TokenTypes.MUL, "*"),
+#             Token(TokenTypes.INT, 5),
+#             ]
+#         output: int|float = Interpreter.interpret(tokens)
+#         expected: int = 15
+#         self.assertEqual(first=output, second=expected)
 
-    def testDiv(self) -> None:
-        tokens: list[Token] = [
-            Token(TokenTypes.INT, 6), 
-            Token(TokenTypes.DIV, "/"),
-            Token(TokenTypes.INT, 2),
-            ]
-        output: int|float = Interpreter.interpret(tokens)
-        expected: float = 3.0
-        self.assertEqual(first=output, second=expected)
+#     def testDiv(self) -> None:
+#         tokens: list[Token] = [
+#             Token(TokenTypes.INT, 6), 
+#             Token(TokenTypes.DIV, "/"),
+#             Token(TokenTypes.INT, 2),
+#             ]
+#         output: int|float = Interpreter.interpret(tokens)
+#         expected: float = 3.0
+#         self.assertEqual(first=output, second=expected)
 
-    def testAssoc(self) -> None:
-        tokens: list[Token] = [
-            Token(TokenTypes.INT, 9), 
-            Token(TokenTypes.MINUS, "-"),
-            Token(TokenTypes.INT, 5),
-            Token(TokenTypes.PLUS, "+"),
-            Token(TokenTypes.INT, 3),
-            Token(TokenTypes.PLUS, "+"),
-            Token(TokenTypes.INT, 11),
-            ]
-        output: int|float = Interpreter.interpret(tokens)
-        expected: int = 9 - 5 + 3 + 11
-        self.assertEqual(first=output, second=expected)
+#     def testAssoc(self) -> None:
+#         tokens: list[Token] = [
+#             Token(TokenTypes.INT, 9), 
+#             Token(TokenTypes.MINUS, "-"),
+#             Token(TokenTypes.INT, 5),
+#             Token(TokenTypes.PLUS, "+"),
+#             Token(TokenTypes.INT, 3),
+#             Token(TokenTypes.PLUS, "+"),
+#             Token(TokenTypes.INT, 11),
+#             ]
+#         output: int|float = Interpreter.interpret(tokens)
+#         expected: int = 9 - 5 + 3 + 11
+#         self.assertEqual(first=output, second=expected)
     
-    def testPrecedence(self) -> None:
-        tokens: list[Token] = [
-            Token(TokenTypes.INT, 7), 
-            Token(TokenTypes.PLUS, "+"),
-            Token(TokenTypes.INT, 5),
-            Token(TokenTypes.MUL, "*"),
-            Token(TokenTypes.INT, 2)
-            ]
-        output: int|float = Interpreter.interpret(tokens)
-        expected: int = 7 + 5 * 2
-        self.assertEqual(first=output, second=expected)
+#     def testPrecedence(self) -> None:
+#         tokens: list[Token] = [
+#             Token(TokenTypes.INT, 7), 
+#             Token(TokenTypes.PLUS, "+"),
+#             Token(TokenTypes.INT, 5),
+#             Token(TokenTypes.MUL, "*"),
+#             Token(TokenTypes.INT, 2)
+#             ]
+#         output: int|float = Interpreter.interpret(tokens)
+#         expected: int = 7 + 5 * 2
+#         self.assertEqual(first=output, second=expected)
 
-    def testParen(self) -> None:
-        tokens: list[Token] = [
-            Token(TokenTypes.INT, 7), 
-            OPERATORS["+"],
-            Token(TokenTypes.INT, 3),
-            OPERATORS["*"],
-            PARENS["("],
-            Token(TokenTypes.INT, 10),
-            OPERATORS["/"],
-            PARENS["("],
-            Token(TokenTypes.INT, 12),
-            OPERATORS["/"],
-            PARENS["("],
-            Token(TokenTypes.INT, 3),
-            OPERATORS["+"],
-            Token(TokenTypes.INT, 1),
-            PARENS[")"],
-            OPERATORS["-"],
-            Token(TokenTypes.INT, 1),
-            PARENS[")"],
-            PARENS[")"]
-            ]
-        output: int|float = Interpreter.interpret(tokens)
-        expected: float = 7 + 3 * (10 / (12 / (3 + 1) - 1))
-        self.assertEqual(first=output, second=expected)
+#     def testParen(self) -> None:
+#         tokens: list[Token] = [
+#             Token(TokenTypes.INT, 7), 
+#             OPERATORS["+"],
+#             Token(TokenTypes.INT, 3),
+#             OPERATORS["*"],
+#             PARENS["("],
+#             Token(TokenTypes.INT, 10),
+#             OPERATORS["/"],
+#             PARENS["("],
+#             Token(TokenTypes.INT, 12),
+#             OPERATORS["/"],
+#             PARENS["("],
+#             Token(TokenTypes.INT, 3),
+#             OPERATORS["+"],
+#             Token(TokenTypes.INT, 1),
+#             PARENS[")"],
+#             OPERATORS["-"],
+#             Token(TokenTypes.INT, 1),
+#             PARENS[")"],
+#             PARENS[")"]
+#             ]
+#         output: int|float = Interpreter.interpret(tokens)
+#         expected: float = 7 + 3 * (10 / (12 / (3 + 1) - 1))
+#         self.assertEqual(first=output, second=expected)
 
 class ParserTests(unittest.TestCase):
     def setUp(self) -> None:
@@ -204,7 +204,7 @@ class ParserTests(unittest.TestCase):
     def testMulti(self) -> None:
         tokens: list[Token] = [
             Token(TokenTypes.INT, 3), 
-            Token(TokenTypes.MUL, "*"),
+            OPERATORS["*"],
             Token(TokenTypes.INT, 5),
             ]
         expected: int = 15
@@ -214,7 +214,7 @@ class ParserTests(unittest.TestCase):
     def testDiv(self) -> None:
         tokens: list[Token] = [
             Token(TokenTypes.INT, 6), 
-            Token(TokenTypes.DIV, "/"),
+            OPERATORS["/"],
             Token(TokenTypes.INT, 2),
             ]
         expected: float = 3.0
@@ -224,11 +224,11 @@ class ParserTests(unittest.TestCase):
     def testAssoc(self) -> None:
         tokens: list[Token] = [
             Token(TokenTypes.INT, 9), 
-            Token(TokenTypes.MINUS, "-"),
+            OPERATORS["-"],
             Token(TokenTypes.INT, 5),
-            Token(TokenTypes.PLUS, "+"),
+            OPERATORS["+"],
             Token(TokenTypes.INT, 3),
-            Token(TokenTypes.PLUS, "+"),
+            OPERATORS["+"],
             Token(TokenTypes.INT, 11),
             ]
         expected: int = 9 - 5 + 3 + 11
@@ -240,7 +240,7 @@ class ParserTests(unittest.TestCase):
             Token(TokenTypes.INT, 7), 
             Token(TokenTypes.PLUS, "+"),
             Token(TokenTypes.INT, 5),
-            Token(TokenTypes.MUL, "*"),
+            OPERATORS["*"],
             Token(TokenTypes.INT, 2)
             ]
         expected: int = 7 + 5 * 2

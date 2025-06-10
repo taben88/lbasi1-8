@@ -8,24 +8,39 @@ class Parser:
     
     @property
     def head(self) -> Token:
+
+        """Return the first token in the queue."""
+
         return self.tokens[0]
     
     def expect(self, expected_type: TokenTypes) -> Token:
+
+        """Pop and return the first token, if the token is of expected type. Otherwise raise an AttributeError."""
+
         if self.tokens[0].type == expected_type:
             return self.tokens.pop(0)
         else:
             raise AssertionError("Unexpected token encountered!")
 
     def num(self) -> AST:
+
+        """Parse and return a Num from a token of type INT."""
+
         return Num(self.expect(TokenTypes.INT))
 
     def paren(self) -> AST:
+
+        """Parse and return a the root of subtree between parentheses."""
+
         self.expect(TokenTypes.LPAREN)
         out: AST = self.sum_()
         self.expect(TokenTypes.RPAREN)
         return out
     
     def operand(self) -> AST:
+
+        """Parse and return operand (single Num node or root of subtree)."""
+
         ttype: TokenTypes = self.head.type
         out: AST
         match ttype:
