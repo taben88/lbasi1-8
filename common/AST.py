@@ -17,6 +17,10 @@ class AST(ABC):
     def _polish(self, printer: "Printer") -> str:
         ...
 
+    @abstractmethod
+    def _lisp(self, printer: "Printer") -> str:
+        ...
+
 class Num(AST):
     def __init__(self, token: Token) -> None:
         super().__init__(token=token, children=[])
@@ -25,6 +29,9 @@ class Num(AST):
         return visitor.visit_num(self)
     
     def _polish(self, printer: "Printer") -> str:
+        return printer._print_num(self)
+    
+    def _lisp(self, printer: "Printer") -> str:
         return printer._print_num(self)
 
 class BinOp(AST):
@@ -36,6 +43,9 @@ class BinOp(AST):
 
     def _polish(self, printer: "Printer") -> str:
         return printer._polish_op(self)
+    
+    def _lisp(self, printer: "Printer") -> str:
+        return printer._lisp_op(self)
 
 class Visitor:
     def visit(self, root: AST) -> int|float:
@@ -68,6 +78,20 @@ class Printer:
         right: str = op.children[1]._polish(self)
         return f"{left} {right} {str(op)}"
     
-    def to_lisp(self, root) -> str:
-        ...
+    def _lisp_op(self, op: AST) -> str:
+        left: str = op.children[0]._lisp(self)
+        right: str = op.children[1]._lisp(self)
+        return f"({str(op)} {left} {right})"
+    
+    def polish(self, root: AST) -> str:
+
+        """Return str with RPN representation of mathematical expression."""
+
+        return root._polish(self)
+
+    def lisp(self, root: AST) -> str:
+
+        """Return str with lisp representation of mathematical expression."""
+
+        return root._lisp(self)
     

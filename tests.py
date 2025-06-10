@@ -305,6 +305,37 @@ class PolishPrinterTests(unittest.TestCase):
         expected: str = "3 5 + 2 *"
         root: AST = Parser(tokens).parse()
         self.assertEqual(first=Printer().polish(root), second=expected)
+
+class LispPrinterTests(unittest.TestCase):
+    def testNum(self) -> None:
+        tokens: list[Token] = [
+            Token(TokenTypes.INT, 3),
+            ]
+        expected: str = "3"
+        root: AST = Parser(tokens).parse()
+        self.assertEqual(first=Printer().lisp(root), second=expected)
+
+    def testSimplex(self) -> None:
+        tokens: list[Token] = [
+            Token(TokenTypes.INT, 3), 
+            OPERATORS["*"],
+            Token(TokenTypes.INT, 5),
+            ]
+        expected: str = "(* 3 5)"
+        root: AST = Parser(tokens).parse()
+        self.assertEqual(first=Printer().lisp(root), second=expected)
+    
+    def testComplex(self) -> None:
+        tokens: list[Token] = [
+            Token(TokenTypes.INT, 2), 
+            OPERATORS["+"],
+            Token(TokenTypes.INT, 3),
+            OPERATORS["*"],
+            Token(TokenTypes.INT, 5),
+            ]
+        expected: str = "(+ 2 (* 3 5))"
+        root: AST = Parser(tokens).parse()
+        self.assertEqual(first=Printer().lisp(root), second=expected)
     
 if __name__ == "__main__":
     unittest.main()
