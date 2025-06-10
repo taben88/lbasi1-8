@@ -10,33 +10,43 @@ class AST(ABC):
         return str(self.token.value)
     
     @abstractmethod
-    def accept(self, visitor: "Visitor") -> int|float:
+    def _accept(self, visitor: "Visitor") -> int|float:
+        ...
+
+    @abstractmethod
+    def _polish(self, printer: "Printer") -> str:
         ...
 
 class Num(AST):
     def __init__(self, token: Token) -> None:
         super().__init__(token=token, children=[])
     
-    def accept(self, visitor: "Visitor") -> int|float:
-        return visitor.visitNum(self)
+    def _accept(self, visitor: "Visitor") -> int|float:
+        return visitor.visit_num(self)
+    
+    def _polish(self, printer: "Printer") -> str:
+        return printer._print_num(self)
 
 class BinOp(AST):
     def __init__(self, token: Token, left: AST, right: AST) -> None:
         super().__init__(token, children = [left, right])
 
-    def accept(self, visitor: "Visitor") -> int|float:
-        return visitor.visitBinOp(self)
+    def _accept(self, visitor: "Visitor") -> int|float:
+        return visitor.visit_bin_op(self)
+
+    def _polish(self, printer: "Printer") -> str:
+        return printer._polish_op(self)
 
 class Visitor:
     def visit(self, root: AST) -> int|float:
-        return root.accept(self)
+        return root._accept(self)
 
-    def visitNum(self, num: Num) -> int|float:
+    def visit_num(self, num: Num) -> int|float:
         return num.token.value
 
-    def visitBinOp(self, op: BinOp) -> int|float:
-        left: int|float = op.children[0].accept(self)
-        right: int|float = op.children[1].accept(self)
+    def visit_bin_op(self, op: BinOp) -> int|float:
+        left: int|float = op.children[0]._accept(self)
+        right: int|float = op.children[1]._accept(self)
         result: int|float = 0
         match op.token.type:
             case TokenTypes.PLUS:
@@ -48,3 +58,22 @@ class Visitor:
             case TokenTypes.DIV:
                 result = left / right
         return result
+    
+class Printer:
+    def polish(self, root: AST) -> str:
+
+        """Return str with RPN representation of mathematical expression."""
+
+        return root._polish(self)
+
+    def _print_num(self, num: Num) -> str:
+        return str(num)
+
+    def _polish_op(self, op: AST) -> str:
+        left: str = op.children[0]._polish(self)
+        right: str = op.children[1]._polish(self)
+        return f"{left} {right} {str(op)}"
+    
+    def to_lisp(self, root) -> str:
+        ...
+    

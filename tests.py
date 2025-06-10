@@ -1,6 +1,6 @@
 import unittest
 import io
-from common import Token, TokenTypes, OPERATORS, PARENS, AST, Visitor
+from common import Token, TokenTypes, OPERATORS, PARENS, AST, Visitor, Printer
 from Lexer import Lexer
 from Parser import Parser
 # import Interpreter
@@ -194,7 +194,7 @@ class ParserTests(unittest.TestCase):
     def testSub(self) -> None:
         tokens: list[Token] = [
             Token(TokenTypes.INT, 3), 
-            Token(TokenTypes.MINUS, "-"),
+            OPERATORS["-"],
             Token(TokenTypes.INT, 5),
             ]
         expected: int = -2
@@ -273,5 +273,38 @@ class ParserTests(unittest.TestCase):
         root: AST = Parser(tokens).parse()
         self.assertEqual(first=self.visitor.visit(root), second=expected)
 
+class PrinterTests(unittest.TestCase):
+    def testPolishNum(self) -> None:
+        tokens: list[Token] = [
+            Token(TokenTypes.INT, 3),
+            ]
+        expected: str = "3"
+        root: AST = Parser(tokens).parse()
+        self.assertEqual(first=Printer().polish(root), second=expected)
+
+    def testPolishSimplex(self) -> None:
+        tokens: list[Token] = [
+            Token(TokenTypes.INT, 3), 
+            OPERATORS["*"],
+            Token(TokenTypes.INT, 5),
+            ]
+        expected: str = "3 5 *"
+        root: AST = Parser(tokens).parse()
+        self.assertEqual(first=Printer().polish(root), second=expected)
+    
+    def testPolishComplex(self) -> None:
+        tokens: list[Token] = [
+            PARENS["("],
+            Token(TokenTypes.INT, 3), 
+            OPERATORS["+"],
+            Token(TokenTypes.INT, 5),
+            PARENS[")"],
+            OPERATORS["*"],
+            Token(TokenTypes.INT, 2),
+            ]
+        expected: str = "3 5 + 2 *"
+        root: AST = Parser(tokens).parse()
+        self.assertEqual(first=Printer().polish(root), second=expected)
+    
 if __name__ == "__main__":
     unittest.main()
