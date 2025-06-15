@@ -3,8 +3,8 @@ from typing import Callable
 
 class Parser:
     def __init__(self, tokens: list[Token]) -> None:
-        self.tokens = tokens
-        self.ast_root = None
+        self.tokens: list[Token] = tokens
+        self.ast_root: AST|None = None
     
     @property
     def head(self) -> Token:
@@ -17,12 +17,12 @@ class Parser:
 
         """Pop and return the first token, if the token is of expected type. Otherwise raise an AttributeError."""
 
-        if self.tokens[0].type == expected_type:
+        if self.head.type == expected_type:
             return self.tokens.pop(0)
         else:
             raise AssertionError("Unexpected token encountered!")
 
-    def num(self) -> AST:
+    def num(self) -> Num:
 
         """Parse and return a Num from a token of type INT."""
 
@@ -52,12 +52,12 @@ class Parser:
                 raise AssertionError("Unexpected token encountered!")
         return out
 
-    def operation(self, op_type: set[TokenTypes], op_start: Callable[[], AST]) -> AST:
-        out: AST = op_start()
+    def bin_op(self, op_type: set[TokenTypes], op_strat: Callable[[], AST]) -> AST:
+        out: AST = op_strat()
         while self.tokens and self.head.type in op_type:
             op_token: Token = self.expect(self.head.type)
             try:
-                right=op_start()
+                right=op_strat()
             except IndexError:
                 raise AssertionError("No more tokens left!")
             else:
@@ -65,10 +65,10 @@ class Parser:
         return out
 
     def product(self) -> AST:
-        return self.operation({TokenTypes.DIV, TokenTypes.MUL}, self.operand)
+        return self.bin_op({TokenTypes.DIV, TokenTypes.MUL}, self.operand)
 
     def sum_(self) -> AST:
-        return self.operation({TokenTypes.PLUS, TokenTypes.MINUS}, self.product)
+        return self.bin_op({TokenTypes.PLUS, TokenTypes.MINUS}, self.product)
 
     def parse(self) -> AST:
         out: AST = self.sum_()
