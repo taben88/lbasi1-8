@@ -34,6 +34,19 @@ class Num(AST):
     def _lisp(self, printer: "Printer") -> str:
         return printer._print_num(self)
 
+class UnOp(AST):
+    def __init__(self, token: Token, operand: AST) -> None:
+        super().__init__(token, children = [operand])
+
+    def _accept(self, visitor: "Visitor") -> int|float:
+        return visitor.visit_un_op(self)
+    
+    def _polish(self, printer: "Printer") -> str:
+        return printer._polish_un_op(self)
+    
+    def _lisp(self, printer: "Printer") -> str:
+        return printer._lisp_un_op(self)
+
 class BinOp(AST):
     def __init__(self, token: Token, left: AST, right: AST) -> None:
         super().__init__(token, children = [left, right])
@@ -54,6 +67,12 @@ class Visitor:
     def visit_num(self, num: Num) -> int|float:
         return num.token.value
 
+    def visit_un_op(self, op: UnOp) -> int|float:
+        operand: int|float = op.children[0]._accept(self)
+        if op.token.type is TokenTypes.MINUS:
+            operand = -operand
+        return operand
+
     def visit_bin_op(self, op: BinOp) -> int|float:
         left: int|float = op.children[0]._accept(self)
         right: int|float = op.children[1]._accept(self)
@@ -73,11 +92,27 @@ class Printer:
     def _print_num(self, num: Num) -> str:
         return str(num)
 
+    def _polish_un_op(self, op: UnOp) -> str:
+        out: str = op.children[0]._polish(self)
+        match op.token.type:
+            case TokenTypes.MINUS:
+                if out[0] != "-":
+                    out = f"-{out}"
+                else:
+                    out = out[1:]
+            case _:
+                pass
+        return out
+
     def _polish_bin_op(self, op: BinOp) -> str:
         left: str = op.children[0]._polish(self)
         right: str = op.children[1]._polish(self)
         return f"{left} {right} {str(op)}"
     
+    def _lisp_un_op(self, op: UnOp) -> str:
+        child : str = op.children[0]._lisp(self)
+        return f"({str(op)} {child})"
+
     def _lisp_bin_op(self, op: BinOp) -> str:
         left: str = op.children[0]._lisp(self)
         right: str = op.children[1]._lisp(self)

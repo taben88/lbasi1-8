@@ -181,6 +181,27 @@ class ParserTests(unittest.TestCase):
         root: AST = Parser(tokens).parse()
         self.assertEqual(first=self.visitor.visit(root), second=expected)
 
+    def testUnary(self) -> None:
+        tokens: list[Token] = [
+            OPERATORS["+"],
+            OPERATORS["-"],
+            Token(TokenTypes.INT, 3)
+        ]
+        expected: int = -3
+        root: AST = Parser(tokens).parse()
+        self.assertEqual(first=self.visitor.visit(root), second=expected)
+
+    def testComplexUnary(self) -> None:
+        tokens: list[Token] = [
+            Token(TokenTypes.INT, 5),
+            OPERATORS["-"],
+            OPERATORS["-"],
+            Token(TokenTypes.INT, 2)
+        ]
+        expected: int = 7
+        root: AST = Parser(tokens).parse()
+        self.assertEqual(first=self.visitor.visit(root), second=expected)
+
     def testAdd(self) -> None:
         tokens: list[Token] = [
             Token(TokenTypes.INT, 3), 
@@ -282,6 +303,28 @@ class PolishPrinterTests(unittest.TestCase):
         root: AST = Parser(tokens).parse()
         self.assertEqual(first=Printer().polish(root), second=expected)
 
+    def testUnary1(self) -> None:
+        tokens: list[Token] = [
+            OPERATORS["-"],
+            OPERATORS["+"],
+            OPERATORS["-"],
+            Token(TokenTypes.INT, 3),
+        ]
+        expected: str = "3"
+        root: AST = Parser(tokens).parse()
+        self.assertEqual(first=Printer().polish(root), second=expected)
+
+    def testUnary2(self) -> None:
+        tokens: list[Token] = [
+            OPERATORS["-"],
+            OPERATORS["-"],
+            OPERATORS["-"],
+            Token(TokenTypes.INT, 3),
+        ]
+        expected: str = "-3"
+        root: AST = Parser(tokens).parse()
+        self.assertEqual(first=Printer().polish(root), second=expected)
+
     def testSimplex(self) -> None:
         tokens: list[Token] = [
             Token(TokenTypes.INT, 3), 
@@ -312,6 +355,17 @@ class LispPrinterTests(unittest.TestCase):
             Token(TokenTypes.INT, 3),
             ]
         expected: str = "3"
+        root: AST = Parser(tokens).parse()
+        self.assertEqual(first=Printer().lisp(root), second=expected)
+
+    def testUnary(self) -> None:
+        tokens: list[Token] = [
+            OPERATORS["-"],
+            OPERATORS["+"],
+            OPERATORS["-"],
+            Token(TokenTypes.INT, 3),
+        ]
+        expected: str = "(- (+ (- 3)))"
         root: AST = Parser(tokens).parse()
         self.assertEqual(first=Printer().lisp(root), second=expected)
 

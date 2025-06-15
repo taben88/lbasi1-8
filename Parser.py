@@ -1,4 +1,4 @@
-from common import AST, Num, BinOp, Token, TokenTypes
+from common import AST, Num, UnOp, BinOp, Token, TokenTypes
 from typing import Callable
 
 class Parser:
@@ -22,6 +22,10 @@ class Parser:
         else:
             raise AssertionError("Unexpected token encountered!")
 
+    def unary_op(self) -> UnOp:
+        ttype: TokenTypes = self.head.type
+        return UnOp(self.expect(ttype), self.operand())
+
     def num(self) -> Num:
 
         """Parse and return a Num from a token of type INT."""
@@ -44,6 +48,8 @@ class Parser:
         ttype: TokenTypes = self.head.type
         out: AST
         match ttype:
+            case TokenTypes.PLUS | TokenTypes.MINUS:
+                out = self.unary_op()
             case TokenTypes.INT:
                 out = self.num()
             case TokenTypes.LPAREN:
