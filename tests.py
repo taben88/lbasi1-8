@@ -17,6 +17,21 @@ class LexerTests(unittest.TestCase):
     def testMultiDigit(self) -> None:
         output: list[Token] = Lexer(io.StringIO("12")).lex()
         self.assertEqual(first=output, second=[Token(TokenTypes.INT, 12)])
+
+    def testReal(self) -> None:
+        outputs: list[list[Token]] = [
+            Lexer(io.StringIO(".123")).lex(),
+            Lexer(io.StringIO("0.123")).lex(),
+            Lexer(io.StringIO("555.")).lex()
+        ]
+        expected: list[list[Token]] = [
+            [Token(TokenTypes.REAL, .123)],
+            [Token(TokenTypes.REAL, .123)],
+            [Token(TokenTypes.INT, 555.)]
+        ]
+        for i in range(len(expected)):
+            with self.subTest(i=i):
+                self.assertEqual(first=outputs[i], second=expected[i])
     
     def testOps(self) -> None:
         output: list[Token] = Lexer(io.StringIO("".join(OPERATORS.keys()))).lex()
@@ -173,11 +188,19 @@ class ParserTests(unittest.TestCase):
         with self.assertRaises(expected_exception=AssertionError):
             Parser(tokens).parse()
 
-    def testNum(self) -> None:
+    def testInt(self) -> None:
         tokens: list[Token] = [
             Token(TokenTypes.INT, 3), 
             ]
         expected: int = 3
+        root: AST = Parser(tokens).parse()
+        self.assertEqual(first=self.visitor.visit(root), second=expected)
+
+    def testReal(self) -> None:
+        tokens: list[Token] = [
+            Token(TokenTypes.REAL, .123), 
+            ]
+        expected: float = .123
         root: AST = Parser(tokens).parse()
         self.assertEqual(first=self.visitor.visit(root), second=expected)
 

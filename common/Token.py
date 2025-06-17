@@ -4,6 +4,7 @@ from collections import namedtuple
 class TokenTypes(IntEnum):
     NONE = 0
     INT = auto()
+    REAL = auto()
     LPAREN = auto()
     RPAREN = auto()
     PLUS = auto()

@@ -26,11 +26,11 @@ class Parser:
         ttype: TokenTypes = self.head.type
         return UnOp(self.expect(ttype), self.operand())
 
-    def num(self) -> Num:
+    def num(self, ttype: TokenTypes) -> Num:
 
         """Parse and return a Num from a token of type INT."""
 
-        return Num(self.expect(TokenTypes.INT))
+        return Num(self.expect(ttype))
 
     def paren(self) -> AST:
 
@@ -50,8 +50,8 @@ class Parser:
         match ttype:
             case TokenTypes.PLUS | TokenTypes.MINUS:
                 out = self.unary_op()
-            case TokenTypes.INT:
-                out = self.num()
+            case TokenTypes.INT | TokenTypes.REAL:
+                out = self.num(ttype)
             case TokenTypes.LPAREN:
                 out = self.paren()
             case _:

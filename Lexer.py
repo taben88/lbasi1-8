@@ -25,6 +25,9 @@ class Lexer:
                     if not self.multi_token_type:
                         self.multi_token_type = TokenTypes.INT
                     self.buffer.write(c)
+                case c if c == "." and self.multi_token_type != TokenTypes.REAL:
+                    self.multi_token_type = TokenTypes.REAL
+                    self.buffer.write(c)
                 case c if c in OPERATORS:
                     if self.multi_token_type:
                         self._emit_multi()
@@ -45,9 +48,18 @@ class Lexer:
             Helper function to handle tokens made up of more than one characters.
         """
 
+        value = self.buffer.getvalue()
         match self.multi_token_type:
             case TokenTypes.INT:
-                value = int(self.buffer.getvalue())
+                value = int(value)
+            case TokenTypes.REAL:
+                if value[-1] == "." and len(value) > 1:
+                    self.multi_token_type = TokenTypes.INT
+                    value = int(value[:-1])
+                elif any(c.isdigit() for c in value):
+                    value = float(self.buffer.getvalue())
+                else:
+                    raise AssertionError("Incomplete token!")
         self.tokens.append(Token(self.multi_token_type, value))
         self.buffer.close()
         self.buffer = io.StringIO()
