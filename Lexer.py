@@ -21,11 +21,11 @@ class Lexer:
                     if self.multi_token_type:
                         self._emit_multi()
                     pass
-                case c if c.isdigit():
+                case c if c.isdigit() and self.multi_token_type in {TokenTypes.NONE, TokenTypes.INT, TokenTypes.REAL}:
                     if not self.multi_token_type:
                         self.multi_token_type = TokenTypes.INT
                     self.buffer.write(c)
-                case c if c == "." and self.multi_token_type != TokenTypes.REAL:
+                case c if c == "." and self.multi_token_type in {TokenTypes.NONE, TokenTypes.INT}:
                     self.multi_token_type = TokenTypes.REAL
                     self.buffer.write(c)
                 case c if c in OPERATORS:
