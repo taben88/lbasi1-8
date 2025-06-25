@@ -86,6 +86,8 @@ class Visitor:
                 result = left * right
             case TokenTypes.DIV:
                 result = left / right
+            case TokenTypes.INT_DIV:
+                result = left // right
         return result
     
 class Printer:

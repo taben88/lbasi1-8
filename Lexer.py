@@ -25,6 +25,10 @@ class Lexer:
                     if not self.multi_token_type:
                         self.multi_token_type = TokenTypes.INT
                     self.buffer.write(c)
+                case c if c.isalpha() and self.multi_token_type in {TokenTypes.NONE, TokenTypes.INT_DIV}:
+                    if not self.multi_token_type:
+                        self.multi_token_type = TokenTypes.INT_DIV
+                    self.buffer.write(c)
                 case c if c == "." and self.multi_token_type in {TokenTypes.NONE, TokenTypes.INT}:
                     self.multi_token_type = TokenTypes.REAL
                     self.buffer.write(c)

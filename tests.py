@@ -265,6 +265,16 @@ class ParserTests(unittest.TestCase):
         root: AST = Parser(tokens).parse()
         self.assertEqual(first=self.visitor.visit(root), second=expected)
 
+    def testIntDiv(self) -> None:
+        tokens: list[Token] = [
+            Token(TokenTypes.INT, 6), 
+            OPERATORS["DIV"],
+            Token(TokenTypes.INT, 2),
+            ]
+        expected: int = 3
+        root: AST = Parser(tokens).parse()
+        self.assertEqual(first=self.visitor.visit(root), second=expected)
+
     def testAssoc(self) -> None:
         tokens: list[Token] = [
             Token(TokenTypes.INT, 9), 

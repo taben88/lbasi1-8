@@ -71,7 +71,7 @@ class Parser:
         return out
 
     def product(self) -> AST:
-        return self.bin_op({TokenTypes.DIV, TokenTypes.MUL}, self.operand)
+        return self.bin_op({TokenTypes.INT_DIV, TokenTypes.DIV, TokenTypes.MUL}, self.operand)
 
     def sum_(self) -> AST:
         return self.bin_op({TokenTypes.PLUS, TokenTypes.MINUS}, self.product)
