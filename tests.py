@@ -367,6 +367,16 @@ class PolishPrinterTests(unittest.TestCase):
         expected: str = "3 5 *"
         root: AST = Parser(tokens).parse()
         self.assertEqual(first=Printer().polish(root), second=expected)
+
+    def testIntDiv(self) -> None:
+        tokens: list[Token] = [
+            Token(TokenTypes.INT, 3), 
+            OPERATORS["DIV"],
+            Token(TokenTypes.INT, 5),
+            ]
+        expected: str = "3 5 DIV"
+        root: AST = Parser(tokens).parse()
+        self.assertEqual(first=Printer().polish(root), second=expected)
     
     def testComplex(self) -> None:
         tokens: list[Token] = [
@@ -409,6 +419,16 @@ class LispPrinterTests(unittest.TestCase):
             Token(TokenTypes.INT, 5),
             ]
         expected: str = "(* 3 5)"
+        root: AST = Parser(tokens).parse()
+        self.assertEqual(first=Printer().lisp(root), second=expected)
+
+    def testIntDiv(self) -> None:
+        tokens: list[Token] = [
+            Token(TokenTypes.INT, 3), 
+            OPERATORS["DIV"],
+            Token(TokenTypes.INT, 5),
+            ]
+        expected: str = "(DIV 3 5)"
         root: AST = Parser(tokens).parse()
         self.assertEqual(first=Printer().lisp(root), second=expected)
     
