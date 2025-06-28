@@ -1,10 +1,10 @@
 from Lexer import Lexer
-import Interpreter
+from Parser import Parser
 import io
-from common import Token
+from common import Token, Visitor
 
 while True:
     lexer = Lexer(io.StringIO(input("calc> ")))
     tokens: list[Token] = lexer.lex()
-    print(tokens)
-    print(Interpreter.interpret(tokens))
+    root = Parser(tokens).parse()
+    print(Visitor().visit(root))
